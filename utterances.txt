@@ -1,0 +1,16 @@
+GetAllStations list stations
+GetAllStations how many stations
+
+GetStationData when is the next train at {Station} going {Direction}
+GetStationData when's the next train at {Station} going {Direction}
+GetStationData what is the next train at {Station} going {Direction}
+GetStationData what's the next train at {Station} going {Direction}
+GetStationData what is the next {Direction} train at {Station}
+GetStationData what's the next {Direction} train at {Station}
+GetStationData next train at {Station} going {Direction}
+GetStationData how many minutes until the next train at {Station} going {Direction}
+GetStationData {Station} going {Direction}
+
+
+// possible utterances
+what are the next {Number} trains {Direction} from {Station}
