@@ -28,12 +28,12 @@ exports.handler = (event, context) => {
 
         switch(event.request.intent.name) {
           case "GetAllStations":
-          context.succeed(
-            generateResponse(
-              buildSpeechletResponse(`List of stations`, true),
-              {}
+            context.succeed(
+              generateResponse(
+                buildSpeechletResponse(`List of stations`, true),
+                {}
+              )
             )
-          )
             break;
             case "GetStationData":
                 var req_direction = "";
@@ -49,7 +49,7 @@ exports.handler = (event, context) => {
                     )
                   )
                 }
-                var endpoint = "/api/v1/trains/stationByName/" + event.request.intent.slots.Station.value + "/600/" + req_direction// ENDPOINT GOES HERE
+                var endpoint = "https://fintan.io/api/v1/trains/stationByName/" + event.request.intent.slots.Station.value + "/600/" + req_direction// ENDPOINT GOES HERE
                 console.log(event.request.intent.slots.Station.value)
                 console.log(endpoint)
                 var body = ""
@@ -63,6 +63,44 @@ exports.handler = (event, context) => {
                     context.succeed(
                       generateResponse(
                         buildSpeechletResponse(`The next train at ${stationFullname} going ${direction} is due in ${dueIn} minutes`, true),
+                        {}
+                      )
+                    )
+                  })
+                })
+                break;
+
+              case "GetNextTrains":
+                var req_direction = "";
+                if(event.request.intent.slots.Direction.value.toUpperCase() === 'SOUTH' || event.request.intent.slots.Direction.value.toUpperCase() === 'SOUTHBOUND') {
+                  req_direction = "SOUTHBOUND"
+                } else if (event.request.intent.slots.Direction.value.toUpperCase() === 'NORTH' || event.request.intent.slots.Direction.value.toUpperCase() === 'NORTHBOUND') {
+                  req_direction = "NORTHBOUND"
+                } else {
+                  context.succeed(
+                    generateResponse(
+                      buildSpeechletResponse(`Please specify a direction. North or South`, true),
+                      {}
+                    )
+                  )
+                }
+                var endpoint = "https://fintan.io/api/v1/trains/stationByName/" + event.request.intent.slots.Station.value + "/600/" + req_direction// ENDPOINT GOES HERE
+                console.log(event.request.intent.slots.Station.value)
+                console.log(endpoint)
+                var body = ""
+                https.get(endpoint, (response) => {
+                  response.on('data', (chunk) => { body += chunk })
+                  response.on('end', () => {
+                    var data = JSON.parse(body)
+                    var times = data.map((elem) => {
+                      return  elem.expArrival;
+                    })
+                    var number = event.request.intent.slots.Number.value
+                    var stationFullname = data[0].stationFullname
+                    var direction = data[0].direction
+                    context.succeed(
+                      generateResponse(
+                        buildSSML(`<speak>The next ${number} trains at ${stationFullname} going ${direction} are <say-as interpret-as="time">${times[0]}</say-as></speak>`, true),
                         {}
                       )
                     )
@@ -97,6 +135,18 @@ buildSpeechletResponse = (outputText, shouldEndSession) => {
     outputSpeech: {
       type: "PlainText",
       text: outputText
+    },
+    shouldEndSession: shouldEndSession
+  }
+
+}
+
+buildSSML = (outputText, shouldEndSession) => {
+
+  return {
+    outputSpeech: {
+      type: "SSML",
+      ssml: outputText
     },
     shouldEndSession: shouldEndSession
   }

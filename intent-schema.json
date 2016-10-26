@@ -15,6 +15,23 @@
           "type": "DIRECTIONS"
         }
       ]
+    },
+    {
+      "intent": "GetNextTrains",
+      "slots": [
+        {
+          "name": "Station",
+          "type": "LIST_STATIONS"
+        },
+        {
+          "name": "Direction",
+          "type": "DIRECTIONS"
+        },
+        {
+          "name": "Number",
+          "type": "AMAZON.NUMBER"
+        }
+      ]
     }
   ]
 }
